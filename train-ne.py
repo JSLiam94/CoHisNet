@@ -1,0 +1,143 @@
+import os
+import argparse
+from torchvision import datasets, transforms
+import torch
+from torch.nn.utils import prune
+import torch.optim as optim
+from torch.utils.data import DataLoader,SubsetRandomSampler
+from my_dataset import MyDataSet
+#from model import swinkan_base_patch4_window7_224 as create_model
+from model_Ms import multi_swin_kan_mini_patch4_window7_224 as create_model
+print('TEST')
+from utils import read_split_data, train_one_epoch, evaluate
+from torch.optim.lr_scheduler import ReduceLROnPlateau  # 引入学习率调度器
+
+def main(args):
+    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
+    w = 224
+    h = 224
+    data_transforms = transforms.Compose([
+        transforms.Resize((w, h)),  # 224
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
+    if os.path.exists("./TEST") is False:
+        os.makedirs("./TEST")
+
+    train_images_path, train_images_label, val_images_path, val_images_label = read_split_data(args.data_path)
+
+    # 实例化训练数据集
+    DATA_DIR = args.data_path
+    train_dir = os.path.join(DATA_DIR, "train")
+    test_dir = os.path.join(DATA_DIR, "test")
+    train_dataset = datasets.ImageFolder(train_dir, transform=data_transforms)
+    val_dataset = datasets.ImageFolder(test_dir, transform=data_transforms)
+    # 打印数据信息
+    print("len of train dataset:" + str(len(train_dataset)))
+    print(train_dataset.classes)
+    print(train_dataset.class_to_idx)
+
+    num_workers = 0
+    print('Using {} dataloader workers every process'.format(num_workers))
+    # 我们只想使用前500个样本进行训练
+    indices = torch.randperm(1000)[:110]
+    sampler = SubsetRandomSampler(indices)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=num_workers, sampler=sampler,pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=num_workers, pin_memory=True)
+    print("Data has been loaded")
+    print("Loading model")
+    if args.weights != "":
+        assert os.path.exists(args.weights), "weights file: '{}' not exist.".format(args.weights)
+
+        model=torch.load(args.weights, map_location=device, weights_only=False)
+    else:
+        model = create_model(num_classes=args.num_classes, image_size=(w, h), device=device).to(device)
+    for name, module in model.named_modules():
+        if isinstance(module, torch.nn.Conv2d):  # 对卷积层进行剪枝
+            prune.l1_unstructured(module, name='weight', amount=0.2)  # 剪枝 20%
+    print("Model has been constructed")
+
+    
+    if args.freeze_layers:
+        for name, para in model.named_parameters():
+            # 除head外，其他权重全部冻结
+            if "head" not in name:
+                para.requires_grad_(False)
+            else:
+                print("training {}".format(name))
+
+    pg = [p for p in model.parameters() if p.requires_grad]
+    optimizer = optim.AdamW(pg, lr=args.lr, weight_decay=1E-2)
+
+    # 动态调整学习率：使用 ReduceLROnPlateau
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3)
+
+    # 早停机制参数
+    early_stopping_patience = 10  # 如果验证集损失连续 10 次没有提升，则停止训练
+    early_stopping_counter = 0
+    best_val_loss = float('inf')  # 初始化最佳验证集损失
+
+    for epoch in range(args.start_epoch, args.start_epoch + args.epochs):
+        # 训练
+        train_loss, train_acc = train_one_epoch(
+            model=model,
+            optimizer=optimizer,
+            data_loader=train_loader,
+            device=device,
+            epoch=epoch
+        )
+        torch.save(model, "./TEST/best_model.pth")
+            
+
+        # 验证
+        if (epoch + 1) % val_epoch == 0:
+            val_loss, val_acc = evaluate(
+                model=model,
+                data_loader=val_loader,
+                device=device,
+                epoch=epoch,
+                txt="./TEST/val.txt"
+            )
+
+            # 动态调整学习率
+            scheduler.step(val_loss)  # 根据验证集损失调整学习率
+
+            # 早停机制
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                early_stopping_counter = 0  # 重置计数器
+                # 保存最佳模型
+                torch.save(model, "./TEST/best_model.pth")
+            else:
+                early_stopping_counter += 1
+                if early_stopping_counter >= early_stopping_patience:
+                    print(f"Early stopping triggered at epoch {epoch}!")
+                    break  # 停止训练
+
+            # 将结果写入日志文件
+            with open("./log-fu.txt", "a") as f:
+                f.write(f"epoch:{epoch} train_loss:{train_loss} train_acc:{train_acc} val_loss:{val_loss} val_acc:{val_acc}\n")
+
+if __name__ == '__main__':
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num_classes', type=int, default=5)
+    parser.add_argument('--epochs', type=int, default=50)
+    parser.add_argument('--batch-size', type=int, default=16)
+    parser.add_argument('--lr', type=float, default=0.01)
+
+    # 数据集所在根目录
+    parser.add_argument('--data-path', type=str, default="D:/HDU/STORE/MINIST/data/fashion")
+
+    # 预训练权重路径，如果不想载入就设置为空字符
+    parser.add_argument('--weights', type=str, default='', help='initial weights path')
+    parser.add_argument('--start_epoch', type=int, default=0, help='training-start-epoch')
+
+    # 是否冻结权重
+    parser.add_argument('--freeze-layers', type=bool, default=False)
+    parser.add_argument('--device', default='cuda:0', help='device id (i.e. 0 or 0,1 or cpu)')
+
+    opt = parser.parse_args()
+    val_epoch = 1  # 每隔 5 个 epoch 验证一次
+    main(opt)
