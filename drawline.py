@@ -5,7 +5,7 @@ import glob
 data_dict = {}
 
 # 获取所有 txt 文件的路径
-file_paths = glob.glob('*.txt')  # 读取当前目录下所有 txt 文件
+file_paths = glob.glob('val*.txt')  # 读取当前目录下所有 txt 文件
 
 # 遍历每个文件并提取数据
 for file_path in file_paths:
@@ -40,11 +40,14 @@ plt.figure(figsize=(10, 6))  # 设置图表大小
 for file_path, data in data_dict.items():
     line, = plt.plot(data['epochs'], data['val_acc'], marker='o', linestyle='-', label=file_path)
     
-"""     # 在每个数据点上显示具体数值
-    for epoch, acc in zip(data['epochs'], data['val_acc']):
-        if epoch is not None and acc is not None:  # 忽略 None 值
-            plt.text(epoch, acc, f'{acc:.4f}', fontsize=7, color=line.get_color(),
-                     ha='center', va='bottom')  # 在数据点上方显示数值 """
+    # 找到每个 Epoch 的最大值
+    max_val_acc = max(data['val_acc']) if data['val_acc'] else None
+    if max_val_acc is not None:
+        # 找到最大值对应的 Epoch
+        max_epoch = data['epochs'][data['val_acc'].index(max_val_acc)]
+        # 在最高点附近显示数值
+        plt.text(max_epoch, max_val_acc, f'{max_val_acc:.5f}', fontsize=7, color=line.get_color(),
+                 ha='center', va='bottom')  # 在数据点上方显示数值
 
 # 添加标题和标签
 plt.title('Epoch vs Validation Accuracy (Multiple Files)')
