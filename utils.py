@@ -247,3 +247,59 @@ def evaluate(model, data_loader, device, epoch,txt):
 
 
     return accu_loss.item() / (step + 1), accu_num.item() / sample_num
+
+@torch.no_grad()
+def evaluate_confusion_matrix(model, data_loader, device, epoch, txt):
+    loss_function = torch.nn.CrossEntropyLoss()
+    model.eval()
+    
+    # 初始化收集变量
+    all_preds_val = []
+    all_targets_val = []
+    all_probs_val = []
+    accu_num = torch.zeros(1).to(device)
+    accu_loss = torch.zeros(1).to(device)
+    sample_num = 0
+
+    data_loader = tqdm(data_loader, file=sys.stdout)
+    for step, data in enumerate(data_loader):
+        images, labels = data
+        sample_num += images.shape[0]
+        
+        pred = model(images.to(device))
+        pred_classes = torch.max(pred, dim=1)[1]
+        accu_num += torch.eq(pred_classes, labels.to(device)).sum()
+        
+        loss = loss_function(pred, labels.to(device))
+        accu_loss += loss
+        
+        probs = torch.nn.functional.softmax(pred, dim=-1)
+        all_probs_val.extend(probs.cpu().numpy())
+        all_preds_val.extend(pred_classes.cpu().numpy())
+        all_targets_val.extend(labels.cpu().numpy())
+        
+        data_loader.desc = f"[valid epoch {epoch}] loss: {accu_loss.item()/(step+1):.3f}, acc: {accu_num.item()/sample_num:.4f}"
+
+    # 计算评估指标（包括混淆矩阵）
+    from sklearn.metrics import confusion_matrix
+    cm = confusion_matrix(all_targets_val, all_preds_val)
+    val_metrics = get_eval_metrics(all_targets_val, all_preds_val, probs_all=all_probs_val, prefix="val_")
+    val_metrics['val_confusion_matrix'] = cm  # 将混淆矩阵加入指标字典
+    # 写入文件
+    with open(txt, 'a') as file:
+        file.write(f'epoch: {epoch}\n')
+        file.write("\nValidation Metrics:\n")
+        print_metrics_txt(val_metrics, file=file)
+        file.write("\nConfusion Matrix:\n")
+        for row in cm:
+            file.write(' '.join(map(str, row)) + '\n')
+            
+    # 打印指标
+    print("Validation Metrics:")
+    print_metrics(val_metrics)
+    print("\nConfusion Matrix:")
+    print(cm)
+
+
+
+    return accu_loss.item()/(step+1), accu_num.item()/sample_num
