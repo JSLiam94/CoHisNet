@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 #from model import swinkan_base_patch4_window7_224 as create_model
 from model_CMs import multi_swin_kan_micro_patch4_window7_224 as create_model
 print('multi_swin_kan_micro_patch4_window7_224')
-from utils import read_split_data, train_one_epoch, evaluate
+from utils import read_split_data, train_one_epoch, evaluate,evaluate_confusion_matrix
 from torch.optim.lr_scheduler import ReduceLROnPlateau  # 引入学习率调度器
 
 def main(args):
