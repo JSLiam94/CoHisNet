@@ -1109,11 +1109,12 @@ class Multi_Swin_KANsformer(nn.Module):
 
         self.norm = norm_layer(self.num_features)
         self.avgpool = nn.AdaptiveAvgPool1d(1)
+        self.stage_weights = nn.Parameter(torch.ones(self.num_layers))
 
         #对比驱动特征聚合模块 (CDFA)
         self.cd_fa = ContrastDrivenFeatureAggregation(
-                                            in_c=int(embed_dim * 2 ** 1),
-                                            dim=int(embed_dim * 2 ** 1),
+                                            in_c=int(embed_dim * 2 ** 0),
+                                            dim=int(embed_dim * 2 ** 0),
                                             num_heads=num_heads[0],
                                             kernel_size=3,
                                             padding=1,
@@ -1150,9 +1151,10 @@ class Multi_Swin_KANsformer(nn.Module):
             # 收集前 N-1 层的特征（排除最后一层）
             if i < self.num_layers - 1:
                 feature_map = x.view(x.shape[0], H, W, -1).permute(0, 3, 1, 2)
+                #feature_map = feature_map * self.stage_weights[i]
                 multi_scale_features.append(feature_map)
         
-        #========== 特征融合部分 ==========#
+        #============= 特征融合部分 ============#
         if len(multi_scale_features) > 0:
             # 1. 统一分辨率至第一层输出尺寸
             first_H, first_W = resolutions[0]   # 第一层特征图尺寸
@@ -1200,7 +1202,7 @@ class Multi_Swin_KANsformer(nn.Module):
             fused_multi_scale_features = fused_multi_scale_features.flatten(2).transpose(1, 2)  # [B, L, C]
         # 5. 残差连接增强特征
         x = x + fused_multi_scale_features  # 融合特征与原始输出相加
-         #========== 分类部分 ==========#
+        #========== 分类部分 ==========#
         x = self.norm(x)    # 层归一化
         x = self.avgpool(x.transpose(1, 2)) # 全局平均池化 [B, C, 1]
         x = torch.flatten(x, 1) # 展平 [B, C]
