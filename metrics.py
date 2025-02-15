@@ -77,4 +77,7 @@ def print_metrics(eval_metrics: Dict[str, Any]) -> None:
     for k, v in eval_metrics.items():
         if "report" in k:
             continue
-        print(f"Test {k}: {v:.3f}")
+        # 尝试将 numpy.ndarray 转换为字符串
+        if isinstance(v, np.ndarray):
+            v = str(v)
+        print(f"Test {k}: {v}")
