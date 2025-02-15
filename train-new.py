@@ -129,7 +129,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_classes', type=int, default=5)
     parser.add_argument('--epochs', type=int, default=40)
     parser.add_argument('--batch-size', type=int, default=64)
-    parser.add_argument('--lr', type=float, default=0.0001)
+    parser.add_argument('--lr', type=float, default=0.001)
 
     # 数据集所在根目录
     parser.add_argument('--data-path', type=str, default="/home/zhengjingyuan/data/ZDRN1.2")
