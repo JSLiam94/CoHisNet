@@ -91,7 +91,7 @@ def main(args):
 
         # 验证
         if (epoch + 1) % val_epoch == 0:
-            val_loss, val_acc = evaluate(
+            val_loss, val_acc = evaluate_confusion_matrix(
                 model=model,
                 data_loader=val_loader,
                 device=device,
