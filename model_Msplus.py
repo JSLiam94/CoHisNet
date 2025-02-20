@@ -1137,6 +1137,80 @@ class Multi_Swin_KANsformer(nn.Module):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
 
+    def forward_features(self, x):
+        B, H, W, C = x.shape
+        x, H, W = self.patch_embed(x)
+        x = self.pos_drop(x)
+
+        multi_scale_features = [] # 存储多尺度特征
+        resolutions = []  # 记录各阶段分辨率
+
+        for i, layer in enumerate(self.layers):
+            x, H, W = layer(x, H, W)
+            resolutions.append((H, W))  
+            # 收集前 N-1 层的特征（排除最后一层）
+            if i < self.num_layers - 1:
+                feature_map = x.view(x.shape[0], H, W, -1).permute(0, 3, 1, 2)
+                #feature_map = feature_map * self.stage_weights[i]
+                multi_scale_features.append(feature_map)
+        
+        #============= 特征融合部分 ============#
+        if len(multi_scale_features) > 0:
+            # 1. 统一分辨率至第一层输出尺寸
+            first_H, first_W = resolutions[0]   # 第一层特征图尺寸
+            for i in range(len(multi_scale_features)):
+                # 双线性插值调整特征图尺寸
+                multi_scale_features[i] = F.interpolate(
+                    multi_scale_features[i],
+                    size=(first_H, first_W),
+                    mode='bilinear',
+                    align_corners=True
+                )
+            # 2. 调整通道数匹配 CDFA 输入
+            for i in range(len(multi_scale_features)):
+                if multi_scale_features[i].shape[1] != self.cd_fa.in_c:
+                    # 使用 1x1 卷积调整通道
+                    adjust_conv = nn.Conv2d(
+                        in_channels=multi_scale_features[i].shape[1],
+                        out_channels=self.cd_fa.in_c,
+                        kernel_size=1,
+                        stride=1,
+                        bias=False
+                    ).to(self.device)
+                    multi_scale_features[i] = adjust_conv(multi_scale_features[i])
+            # 3. 对比驱动特征聚合 (CDFA)
+            fused_multi_scale_features = self.cd_fa(
+                        multi_scale_features[0],    # 第一层特征
+                        multi_scale_features[1],    # 第二层特征
+                        multi_scale_features[2]     # 第三层特征
+                    )
+
+            # 4. 调整融合特征与最终输出匹配
+            # 展平并转置 [B, C, H, W] -> [B, L, C]
+            fused_multi_scale_features = fused_multi_scale_features.flatten(2).transpose(1, 2)
+            
+            fused_multi_scale_features = fused_multi_scale_features.view(B, -1, self.num_features)  # [B, L, C] 
+            # 恢复形状并与原始特征相加
+            B, H_f, W_f = fused_multi_scale_features.shape
+            fused_multi_scale_features = fused_multi_scale_features.view(B, H_f, W_f, -1).permute(0, 3, 1, 2)  # [B, C, H, W]
+            # 插值到网络最终层分辨率
+            fused_multi_scale_features = F.interpolate(
+                                    fused_multi_scale_features,
+                                    size=(H, W), mode='bilinear', 
+                                    align_corners=True
+                                )
+            fused_multi_scale_features = fused_multi_scale_features.flatten(2).transpose(1, 2)  # [B, L, C]
+        # 5. 残差连接增强特征
+        x = x + fused_multi_scale_features  # 融合特征与原始输出相加
+        #========== 分类部分 ==========#
+        x = self.norm(x)    # 层归一化
+        x = self.avgpool(x.transpose(1, 2)) # 全局平均池化 [B, C, 1]
+        x = torch.flatten(x, 1) # 展平 [B, C]
+
+        # Apply the classification head
+        #x = self.head(x)    # 不经过KAN 分类头
+
+        return x
     def forward(self, x):
         B, H, W, C = x.shape
         x, H, W = self.patch_embed(x)
@@ -1212,7 +1286,6 @@ class Multi_Swin_KANsformer(nn.Module):
 
         return x
     
-
 class Swin_Fusion_KANsformer(nn.Module):
     r""" Swin Transformer
         A PyTorch impl of : `Swin Transformer: Hierarchical Vision Transformer using Shifted Windows`  -
