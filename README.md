@@ -1,6 +1,7 @@
 # CMSwinKAN
 ## Contrast Multi-Scale Adaptive Swin KANsformer
-<img width="874" alt="image" src="https://github.com/user-attachments/assets/55ebb92a-1504-4af2-a986-917c33a3c028" />
+![image](https://github.com/user-attachments/assets/e374c837-91f7-4d56-9799-2116da9523e7)
+
 
 
 # References
