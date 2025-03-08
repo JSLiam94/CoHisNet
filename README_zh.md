@@ -1,6 +1,6 @@
 CMSwinKAN
 =========
-**``Read this in other languages: ``[English](README_zh.md)|中文.**
+**``Read this in other languages: ``[English](README.md)|中文.**
 ---------
 ### Contrast Multi-Scale Adaptive Swin KANsformer
 ### 对比驱动下的多尺度特征融合自适应Swin KANsformer
