@@ -7,7 +7,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 #from my_dataset import MyDataSet
 #from model import swinkan_base_patch4_window7_224 as create_model
-from model_CMs import multi_swin_kan_micro_patch4_window7_224 as create_model
+from model_Msplus import multi_swin_kan_micro_patch4_window7_224 as create_model
 print('multi_swin_kan_micro_patch4_window7_224')
 from utils import read_split_data, train_one_epoch, evaluate,evaluate_confusion_matrix
 from torch.optim.lr_scheduler import ReduceLROnPlateau  # 引入学习率调度器
@@ -45,13 +45,12 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
     print("Data has been loaded")
     print("Loading model")
-    #model = torch.load("/home/zhushenghao/data/JS/sk/multi_swin_kan_micro_patch4_window7_224/model.pth",weights_only=False)
     
 
     if args.weights != "":
         assert os.path.exists(args.weights), "weights file: '{}' not exist.".format(args.weights)
         model = torch.load(args.weights, map_location=device, weights_only=False)
-        #model.load_state_dict(torch.load(args.weights, map_location=device, weights_only=True))
+
     else:
             model = create_model(num_classes=args.num_classes, device=device).to(device)
             for name, module in model.named_modules():
@@ -131,10 +130,10 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=64)
     parser.add_argument('--lr', type=float, default=0.001)
 
-    # 数据集所在根目录
-    parser.add_argument('--data-path', type=str, default="/home/zhengjingyuan/data/ZDRN1.2")
+    # 数据集根目录
+    parser.add_argument('--data-path', type=str, default="your-dataset-path-with-train/test")
 
-    # 预训练权重路径，如果不想载入就设置为空字符
+    # 预训练权重路径
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--start_epoch', type=int, default=0, help='training-start-epoch')
 
@@ -143,5 +142,5 @@ if __name__ == '__main__':
     parser.add_argument('--device', default='cuda:0', help='device id (i.e. 0 or 0,1 or cpu)')
 
     opt = parser.parse_args()
-    val_epoch = 2  # 每隔 5 个 epoch 验证一次
+    val_epoch = 2  # 每隔 2 个 epoch 验证一次
     main(opt)
