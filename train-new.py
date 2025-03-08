@@ -5,8 +5,7 @@ import torch
 from torch.nn.utils import prune
 import torch.optim as optim
 from torch.utils.data import DataLoader
-#from my_dataset import MyDataSet
-#from model import swinkan_base_patch4_window7_224 as create_model
+
 from model_Msplus import multi_swin_kan_micro_patch4_window7_224 as create_model
 print('multi_swin_kan_micro_patch4_window7_224')
 from utils import read_split_data, train_one_epoch, evaluate,evaluate_confusion_matrix
