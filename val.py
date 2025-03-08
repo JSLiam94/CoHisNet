@@ -5,7 +5,7 @@ import torch
 from torch.nn.utils import prune
 from torch.utils.data import DataLoader
 #from model import swinkan_base_patch4_window7_224 as create_model
-from model_CMs import multi_swin_kan_micro_patch4_window7_224 as create_model
+from model_Msplus import multi_swin_kan_micro_patch4_window7_224 as create_model
 print('val-multi_swin_kan_micro_patch4_window7_224')
 from utils import evaluate_confusion_matrix,evaluate
 
