@@ -9,15 +9,20 @@ from torch.utils.data import DataLoader
 from model_Msplus import multi_swin_kan_micro_patch4_window7_224 as create_model
 print('multi_swin_kan_micro_patch4_window7_224')
 from utils import read_split_data, train_one_epoch, evaluate,evaluate_confusion_matrix
-from torch.optim.lr_scheduler import ReduceLROnPlateau  # 引入学习率调度器
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 
 def main(args):
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
-    w = 224
-    h = 224
-    data_transforms = transforms.Compose([
+    w = 384
+    h = 384
+    train_transforms = transforms.Compose([
         transforms.Resize((w, h)), 
         transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
+    val_transforms = transforms.Compose([
+        transforms.Resize((w, h)), 
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
@@ -30,8 +35,8 @@ def main(args):
     DATA_DIR = args.data_path
     train_dir = os.path.join(DATA_DIR, "train")
     test_dir = os.path.join(DATA_DIR, "test")
-    train_dataset = datasets.ImageFolder(train_dir, transform=data_transforms)
-    val_dataset = datasets.ImageFolder(test_dir, transform=data_transforms)
+    train_dataset = datasets.ImageFolder(train_dir, transform=train_transforms)
+    val_dataset = datasets.ImageFolder(test_dir, transform=val_transforms)
     # 打印数据信息
     print("len of train dataset:" + str(len(train_dataset)))
     print("len of val dataset:" + str(len(val_dataset)))
@@ -68,11 +73,11 @@ def main(args):
     pg = [p for p in model.parameters() if p.requires_grad]
     optimizer = optim.AdamW(pg, lr=args.lr, weight_decay=1E-3)
 
-    # 动态调整学习率：使用 ReduceLROnPlateau
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=1)
+    # 动态调整学习率：使用余弦退火
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, eta_min=0.00001)
 
     # 早停机制参数
-    early_stopping_patience = 5  # 如果验证集损失连续 5 次没有提升，则停止训练
+    early_stopping_patience = 10  # 如果验证集损失连续 10 次没有提升，则停止训练
     early_stopping_counter = 0
     best_val_loss = float('inf')  # 初始化最佳验证集损失
 
@@ -115,7 +120,7 @@ def main(args):
                 early_stopping_counter += 1
                 if early_stopping_counter >= early_stopping_patience:
                     print(f"Early stopping triggered at epoch {epoch}!")
-                    with open("./log-fu.txt", "a") as f:
+                    with open("./log.txt", "a") as f:
                         f.write(f"Early stopping triggered at epoch {epoch}!")
 
                     break  # 停止训练
@@ -125,7 +130,7 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_classes', type=int, default=5)
-    parser.add_argument('--epochs', type=int, default=40)
+    parser.add_argument('--epochs', type=int, default=200)
     parser.add_argument('--batch-size', type=int, default=64)
     parser.add_argument('--lr', type=float, default=0.001)
 
@@ -141,5 +146,5 @@ if __name__ == '__main__':
     parser.add_argument('--device', default='cuda:0', help='device id (i.e. 0 or 0,1 or cpu)')
 
     opt = parser.parse_args()
-    val_epoch = 2  # 每隔 2 个 epoch 验证一次
+    val_epoch = 5  # 每隔 5 个 epoch 验证一次
     main(opt)
