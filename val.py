@@ -12,11 +12,10 @@ from utils import evaluate_confusion_matrix,evaluate
 
 def main(args):
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
-    w = 224
-    h = 224
+    w = 384
+    h = 384
     data_transforms = transforms.Compose([
-        transforms.Resize((w, h)),  # 224
-        transforms.RandomHorizontalFlip(),
+        transforms.Resize((w, h)),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
@@ -84,7 +83,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.001)
 
     # 数据集所在根目录
-    parser.add_argument('--data-path', type=str, default="/home/zhengjingyuan/data/ZDRN1.2")
+    parser.add_argument('--data-path', type=str, default="your-data-path")
 
     # 预训练权重路径，如果不想载入就设置为空字符
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
