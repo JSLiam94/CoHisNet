@@ -3,7 +3,14 @@ CMSwinKAN
 **``Read this in other languages: ``English|[中文](README_zh.md).**
 --------
 ### Contrast Multi-Scale Adaptive Swin KANsformer for pathological images classification
-![image](https://github.com/user-attachments/assets/e374c837-91f7-4d56-9799-2116da9523e7)
+
+## Patch-level classification
+![CMSwinKAN](https://github.com/user-attachments/assets/531148e7-b1ce-4ee9-bf24-c13f0c6d70ac)
+
+## WSI-level classification
+![wsi-vote](https://github.com/user-attachments/assets/b9b13863-4054-41a8-b7a0-ab59e986f6ac)
+
+
 
 ## Environment
 
@@ -12,7 +19,7 @@ CMSwinKAN
     pip install -r requirements.txt
 
 ## Dataset
-The default organization method of the dataset<br>
+The default organization method of the dataset(train:test = 8:2)<br>
 
     dataset  
      ├── train
@@ -31,6 +38,14 @@ Modify the `data-path` and set `num_classes`、`num_workers` (for Windows system
 ## Patch-level evaluation
 
     python val.py
+
+## WSI-level evaluation(hard vote)
+
+    python WSI_vote_hard.py
+
+## WSI-level evaluation(soft vote)
+
+    python WSI_vote.py
   
 ## References
 ### Some of the codes are borrowed from:
