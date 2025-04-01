@@ -8,7 +8,7 @@ CMSwinKAN
 ## Patch-level classification
 ![CMSwinKAN](https://github.com/user-attachments/assets/531148e7-b1ce-4ee9-bf24-c13f0c6d70ac)
 
-## WSI-level classification(a heuristic Soft Voting classification process based on clinical knowledge rules)
+### WSI-level classification(a heuristic Soft Voting classification process based on clinical knowledge rules)
 ![wsi-vote](https://github.com/user-attachments/assets/b9b13863-4054-41a8-b7a0-ab59e986f6ac)
 
 
