@@ -2,6 +2,7 @@ CMSwinKAN
 =========
 **``Read this in other languages: ``English|[中文](README_zh.md).**
 --------
+#### Towards Accurate and Interpretable Neuroblastoma Diagnosis via Contrastive Multi-scale Pathological Image Analysis
 ### Contrast Multi-Scale Adaptive Swin KANsformer for pathological images classification
 
 ## Patch-level classification
@@ -19,7 +20,7 @@ CMSwinKAN
     pip install -r requirements.txt
 
 ## Dataset
-The default organization method of the dataset(train:test = 8:2)<br>
+The default organization method of the dataset(train : test = 8 : 2)<br>
 
     dataset  
      ├── train
