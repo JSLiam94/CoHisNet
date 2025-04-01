@@ -4,7 +4,6 @@ from torchvision import datasets, transforms
 import torch
 from torch.nn.utils import prune
 from torch.utils.data import DataLoader
-#from model import swinkan_base_patch4_window7_224 as create_model
 from model_Msplus import multi_swin_kan_micro_patch4_window7_224 as create_model
 print('val-multi_swin_kan_micro_patch4_window7_224')
 from utils import evaluate_confusion_matrix,evaluate
@@ -19,8 +18,8 @@ def main(args):
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
-    if os.path.exists("./multi_swin_kan_micro_patch4_window7_224") is False:
-        os.makedirs("./multi_swin_kan_micro_patch4_window7_224")
+    if os.path.exists("./multi_swin_kan_micro_patch4_window7_384") is False:
+        os.makedirs("./multi_swin_kan_micro_patch4_window7_384")
 
     #train_images_path, train_images_label, val_images_path, val_images_label = read_split_data(args.data_path)
 
@@ -69,7 +68,7 @@ def main(args):
                     data_loader=val_loader,
                     device=device,
                     epoch=0,
-                    txt="./multi_swin_kan_micro_patch4_window7_224/test-2.txt"
+                    txt="./multi_swin_kan_micro_patch4_window7_384/test-2.txt"
                 )
 
 
