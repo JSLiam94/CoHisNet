@@ -2,12 +2,12 @@ CMSwinKAN
 =========
 **``Read this in other languages: ``[English](README.md)|中文.**
 ---------
-### 论文
+## 论文
 [Towards Accurate and Interpretable Neuroblastoma Diagnosis via Contrastive Multi-scale Pathological Image Analysis](https://arxiv.org/abs/2504.13754)
 #### 通过对比驱动的多尺度病理图像分析进行准确且可解释的神经母细胞瘤诊断
-### 名字由来
-Contrast Multi-Scale Adaptive Swin KANsformer <br>
-对比驱动下的多尺度特征融合自适应 Swin KANsformer
+## 名字由来
+#### Contrast Multi-Scale Adaptive Swin KANsformer for pathological images classification
+#### 对比驱动下的多尺度特征融合自适应 Swin KANsformer 用于病理图像分类
 
 ## 图像级别分类
 ![CMSwinKAN](https://github.com/user-attachments/assets/a3a72e0a-7df6-43b2-8a3e-6b766ae8b609)
