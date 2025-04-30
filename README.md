@@ -3,7 +3,7 @@ CMSwinKAN
 **``Read this in other languages: ``English|[中文](README_zh.md)|[日本語](README_ja.md).**
 --------
 ## Paper
-#### [Towards Accurate and Interpretable Neuroblastoma Diagnosis via Contrastive Multi-scale Pathological Image Analysis](https://arxiv.org/abs/2504.13754)
+##### [Towards Accurate and Interpretable Neuroblastoma Diagnosis via Contrastive Multi-scale Pathological Image Analysis](https://arxiv.org/abs/2504.13754)
 ## The origin of the name
 ### Contrast Multi-Scale Adaptive Swin KANsformer for pathological images classification
 
