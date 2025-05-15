@@ -15,6 +15,8 @@ CMSwinKAN
 ## WSI级别分类(基于临床知识规则的启发式软投票机制)
 ![wsi-vote](https://github.com/user-attachments/assets/83751bc2-dd9a-4013-97be-797b4e34f439)
 
+![Overall](https://github.com/user-attachments/assets/45eef68b-71b6-4bfa-bd91-0af0090afc87)
+
 
 ## 环境配置
 
