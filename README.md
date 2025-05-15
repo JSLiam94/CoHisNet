@@ -14,6 +14,9 @@ CMSwinKAN
 ![wsi-vote](https://github.com/user-attachments/assets/b9b13863-4054-41a8-b7a0-ab59e986f6ac)
 
 
+![Overall](https://github.com/user-attachments/assets/449c4393-8cb8-4b61-8e66-abdad72eb624)
+
+
 
 ## Environment
 
