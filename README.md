@@ -1,4 +1,4 @@
-CMSwinKAN
+CoHisNet
 =========
 **``Read this in other languages: ``English|[中文](README_zh.md).**
 --------
@@ -6,22 +6,19 @@ CMSwinKAN
 ##### [Towards Accurate and Interpretable Neuroblastoma Diagnosis via Contrastive Multi-scale Pathological Image Analysis](https://arxiv.org/abs/2504.13754)
 ## The origin of the name
 ### Contrast Multi-Scale Adaptive Swin KANsformer for pathological images classification
+### Contrastive Histopathology Network
 
 ## Patch-level classification
-![CMSwinKAN](https://github.com/user-attachments/assets/531148e7-b1ce-4ee9-bf24-c13f0c6d70ac)
+![CoHisNet](https://github.com/user-attachments/assets/24950147-6ba7-42ff-89e0-6ed6fc3d0bba)
 
 ### WSI-level classification(a heuristic Soft Voting classification process based on clinical knowledge rules)
-![wsi-vote](https://github.com/user-attachments/assets/b9b13863-4054-41a8-b7a0-ab59e986f6ac)
-
-
-![Overall](https://github.com/user-attachments/assets/449c4393-8cb8-4b61-8e66-abdad72eb624)
-
+![wsi-vote](https://github.com/user-attachments/assets/c8223b14-4243-427d-92e3-1638f218110c)
 
 
 ## Environment
 
-    conda create -n CMSwinKAN python=3.8.20
-    conda activate CMSwinKAN
+    conda create -n CoHisNet python=3.8.20
+    conda activate CoHisNet
     pip install -r requirements.txt
 
 ## Dataset
