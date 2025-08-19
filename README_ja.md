@@ -1,22 +1,20 @@
-CMSwinKAN
+CoHisNet
 =========
 **``Read this in other languages: ``[English](README.md)|[中文](README_zh.md)|日本語.**
 --------
 ## 論文
 #### [対比駆動の多尺度病理画像解析による正確で解釈可能な神経芽細胞腫診断](https://arxiv.org/abs/2504.13754)
-## 名前の由来
-### 病理画像分類のための対比多尺度適応型Swin KANsformer
 
 ## パッチレベル分類
-![CMSwinKAN](https://github.com/user-attachments/assets/531148e7-b1ce-4ee9-bf24-c13f0c6d70ac)
+![CoHisNet](https://github.com/user-attachments/assets/24950147-6ba7-42ff-89e0-6ed6fc3d0bba)
 
 ### WSIレベル分類（臨床知識ルールに基づくヒューリスティックなソフト投票分類プロセス）
-![wsi-vote](https://github.com/user-attachments/assets/b9b13863-4054-41a8-b7a0-ab59e986f6ac)
+![wsi-vote](https://github.com/user-attachments/assets/c8223b14-4243-427d-92e3-1638f218110c)
 
 ## 環境設定
 
-    conda create -n CMSwinKAN python=3.8.20
-    conda activate CMSwinKAN
+    conda create -n CoHisNet python=3.8.20
+    conda activate CoHisNet
     pip install -r requirements.txt
 
 ## データセット
