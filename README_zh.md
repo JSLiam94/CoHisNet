@@ -1,4 +1,4 @@
-CMSwinKAN
+CoHisNet
 =========
 **``Read this in other languages: ``[English](README.md)|中文.**
 ---------
@@ -10,18 +10,18 @@ CMSwinKAN
 #### 对比驱动下的多尺度特征融合自适应 Swin KANsformer 用于病理图像分类
 
 ## 图像级别分类
-![CMSwinKAN](https://github.com/user-attachments/assets/a3a72e0a-7df6-43b2-8a3e-6b766ae8b609)
+![CoHisNet](https://github.com/user-attachments/assets/24950147-6ba7-42ff-89e0-6ed6fc3d0bba)
 
 ## WSI级别分类(基于临床知识规则的启发式软投票机制)
-![wsi-vote](https://github.com/user-attachments/assets/83751bc2-dd9a-4013-97be-797b4e34f439)
+![wsi-vote](https://github.com/user-attachments/assets/c8223b14-4243-427d-92e3-1638f218110c)
 
-![Overall](https://github.com/user-attachments/assets/45eef68b-71b6-4bfa-bd91-0af0090afc87)
-
+## 私有数据集·收集与预处理
+![data](https://github.com/user-attachments/assets/efadaa36-172e-4d36-85fc-6adbe35390c6)
 
 ## 环境配置
 
-    conda create -n CMSwinKAN python=3.8.20
-    conda activate CMSwinKAN
+    conda create -n CoHisNet python=3.8.20
+    conda activate CoHisNet
     pip install -r requirements.txt
 
 ## 数据集组织
