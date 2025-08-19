@@ -14,6 +14,8 @@ CoHisNet
 ### WSI-level classification(a heuristic Soft Voting classification process based on clinical knowledge rules)
 ![wsi-vote](https://github.com/user-attachments/assets/c8223b14-4243-427d-92e3-1638f218110c)
 
+## Private Dataset · Collection and Preprocessing
+![data](https://github.com/user-attachments/assets/efadaa36-172e-4d36-85fc-6adbe35390c6)
 
 ## Environment
 
